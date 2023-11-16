@@ -21,7 +21,7 @@ class Tools {
         $arPushCss = [];
 
         if(!empty($matches[1])){
-            $fragLinks = ['fonts', 'optimisation', 'page_', 'template_'];
+            $fragLinks = ['page_', 'template_'];
             foreach ($matches[1] as $link) {
                 foreach ($fragLinks as $frag) {
                     if(strpos($link, $frag) !== false){
