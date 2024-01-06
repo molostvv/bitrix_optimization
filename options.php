@@ -3,6 +3,7 @@ use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\HttpApplication;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Config\Option;
+use Vspace\Optimization\DataProviders\OptionProvider;
 
 Loc::loadMessages(__FILE__);
 
@@ -12,29 +13,171 @@ $module_id = htmlspecialchars($request['mid'] != '' ? $request['mid'] : $request
 // подключаем наш модуль
 Loader::includeModule($module_id);
 
+$keyScriptCode    = OptionProvider::KEY_CODE; 
+$keyScriptPlace   = OptionProvider::KEY_PLACE;
+$keyScriptDelayed = OptionProvider::KEY_DELAYED;
+$keyScriptTime    = OptionProvider::KEY_TIME;
+$keyScriptCss     = OptionProvider::KEY_CSS;
+
+
 /*
  * Параметры модуля со значениями по умолчанию
  */
 $aTabs = array(
-    array(
+    // 0 => array(
+    //     /*
+    //      * Вкладка «Основные настройки»
+    //      */
+    //     'DIV'     => 'edit1',
+    //     'TAB'     => Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_GENERAL'),
+    //     'TITLE'   => Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_GENERAL'),
+    //     'OPTIONS' => array(
+    //         // push css
+    //         Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_HEADERS'),
+    //         array(
+    //             'headers_push_css',
+    //             Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_PUSH_CSS'),
+    //             '',
+    //             array('checkbox')
+    //         ),
+    //     )
+    // ),
+    0 => array(
         /*
-         * Вкладка «Основные настройки»
+         * Вкладка «Внешние скрипты»
          */
-        'DIV'     => 'edit1',
-        'TAB'     => Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_GENERAL'),
-        'TITLE'   => Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_GENERAL'),
+        'DIV'     => 'edit2',
+        'TAB'     => Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS'),
+        'TITLE'   => Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_R'),
         'OPTIONS' => array(
-            // push css
-            Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_HEADERS'),
+            // Общие настройки для внешних скриптов
+            Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_GENERAL'),
+           
+            // Rocket Loader Off
+            // array(
+            //     'rocket_loader',
+            //     Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_RL'),
+            //     'Y',
+            //     array('checkbox')
+            // ),
+
+            ['note' => "При включенние отложенной загрузки к скрипту будет добавлен атрибут data-cfasync='false' который игнорирует выполнение скрипта Rocket Loader'ом"],
+            
+            // Метрика
+            Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_YM'),
             array(
-                'headers_push_css',
-                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_PUSH_CSS'),
+                $keyScriptCode . '_ym',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_YM_VALUE'),
+                '',
+                array('textarea', 12, 60)
+            ),
+            array(
+                $keyScriptPlace .'_ym',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_PLACE'),
+                '',
+                array('selectbox',
+                    array(
+                        "head" => "<head>",
+                        "begin_body" => "после <body>",
+                        "end_body" => "перед </body>"
+                    )
+                )
+            ),
+            array(
+                $keyScriptDelayed . '_ym',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_DELAYED'),
                 '',
                 array('checkbox')
             ),
+            array(
+                $keyScriptTime . '_ym',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_TIME'),
+                '',
+                array('text', 5)
+            ),
+
+            // Google Tag Manager
+            Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_GTM'),
+            array(
+                $keyScriptCode . '_gtm',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_GTM_VALUE'),
+                '',
+                array('textarea', 12, 60)
+            ),
+            array(
+                $keyScriptPlace . '_gtm',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_PLACE'),
+                '',
+                array('selectbox',
+                    array(
+                        "head" => "<head>",
+                        "begin_body" => "после <body>",
+                        "end_body" => "перед </body>"
+                    )
+                )
+            ),
+            array(
+                $keyScriptDelayed . '_gtm',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_DELAYED'),
+                '',
+                array('checkbox')
+            ),
+            array(
+                $keyScriptTime . '_gtm',
+                Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_TIME'),
+                '',
+                array('text', 5)
+            )
         )
-    )
+    ),
 );
+
+for($i = 1; $i < 6; $i++){
+    // Внешние скрипты список
+    $aTabs[0]["OPTIONS"][] = Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_ITEM') . ' ' . $i;
+
+    $aTabs[0]["OPTIONS"][] = [
+        $keyScriptCode . '_' . $i,
+        Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_CODE'),
+        '',
+        array('text', 60)
+    ];
+
+    if($i == 1){
+        $aTabs[0]["OPTIONS"][] = [
+            $keyScriptCss . '_' . $i,
+            Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_CSS'),
+            '',
+            array('text', 60)
+        ];
+    }
+
+    $aTabs[0]["OPTIONS"][] = [
+        $keyScriptPlace . '_' .  $i,
+        Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_PLACE'),
+        '',
+        array('selectbox',
+            array(
+                "head" => "<head>",
+                "begin_body" => "после <body>",
+                "end_body" => "перед </body>"
+            ))
+    ];
+
+    $aTabs[0]["OPTIONS"][] = [
+        $keyScriptDelayed . '_' . $i,
+        Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_DELAYED'),
+        '',
+        array('checkbox')
+    ];
+
+    $aTabs[0]["OPTIONS"][] = [
+        $keyScriptTime . '_' . $i,
+        Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_TIME'),
+        '',
+        array('text', 5)
+    ];
+}
 
 /*
  * Создаем форму для редактирвания параметров модуля
