@@ -10,6 +10,8 @@ class Tools {
     static private $_isInsertedBeginBody;
     static private $_isInsertedEndBody;
 
+    static public $_optionData;
+
     /**
      * Добавление push заголовков для сервера
      * @param $content
@@ -47,7 +49,21 @@ class Tools {
     public static function externalScripts(){
 
         $oProvider = new OptionProvider();
-        var_dump($oProvider->getOptions());
+        $optionData = $oProvider->getOptions();
+
+        foreach ($optionData as $place => $scripts) {
+
+            $content = "\n";
+            foreach ($scripts as $scriptData) {
+                if(!empty($scriptData[OptionProvider::KEY_CODE_MODIF])){
+                    $content .= $scriptData[OptionProvider::KEY_CODE_MODIF] . "\n";
+                } elseif(!empty($scriptData[OptionProvider::KEY_CODE])){
+                    $content .= $scriptData[OptionProvider::KEY_CODE] . "\n";
+                }
+            }
+
+            self::$_optionData[$place] = $content;
+        }  
 
 
     }
@@ -57,7 +73,7 @@ class Tools {
     */
     public static function insertHead(){
         self::$_isInsertedHead = true;
-        echo '<!-- insertHead -->' . "\n";
+        echo '<!-- insertHead -->' . "\n" . Tools::$_optionData[ OptionProvider::KEY_PLACE_HEAD ] . "\n";
     }
 
     /**
@@ -65,7 +81,7 @@ class Tools {
     */
     public static function insertBeginBody(){
         self::$_isInsertedBeginBody = true;
-        echo '<!-- insertBeginBody -->' . "\n";
+        echo '<!-- insertBeginBody -->' . "\n" . Tools::$_optionData[ OptionProvider::KEY_PLACE_BEGIN_BODY ] . "\n";
     }
 
     /**
@@ -73,7 +89,7 @@ class Tools {
     */
     public static function insertEndBody(){
         self::$_isInsertedEndBody = true;
-        echo '<!-- insertEndBody -->' . "\n";
+        echo '<!-- insertEndBody -->' . "\n" . Tools::$_optionData[ OptionProvider::KEY_PLACE_END_BODY ] . "\n";
     }
     
 
