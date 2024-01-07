@@ -66,6 +66,49 @@ class OptionProvider
                 if($value[OptionProvider::KEY_DELAYED] == 'Y'){
                     $type = 'delayed';
                 }
+
+                $scriptParams = [];
+                $dom = new \DomDocument();
+                $dom->loadHTML($value[OptionProvider::KEY_CODE], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                
+                $nodeScript = $dom->getElementsByTagName('script');
+
+                $nodeScript = is_object($nodeScript[0]) ? $nodeScript[0] : false;
+
+                foreach ($nodeScript->attributes as $attr) {
+                    $scriptParams[$attr->name] = $attr->value;
+                }
+
+                if(array_key_exists('src', $scriptParams)){ // внешний скрипт
+                    $value[OptionProvider::KEY_CODE_MODIF] = "var script = document.createElement('script'); script.src = '". $scriptParams['src'] ."'; script.charset = 'UTF-8'; document.getElementsByTagName('body')[0].appendChild(script);";
+                
+                    if(!empty($value[OptionProvider::KEY_TIME])){
+                        $value[OptionProvider::KEY_CODE_MODIF] = 'setTimeout(function(){ ' . $value[OptionProvider::KEY_CODE_MODIF] . ' }, '.$value[OptionProvider::KEY_TIME].');';
+                    }
+
+                    $nodeScript->removeAttribute('src');
+                    $nodeScript->removeAttribute('async');
+                    $nodeScript->setAttribute('type', $type);
+                    $nodeScript->setAttribute('data-cfasync', 'false');
+                    $nodeScript->textContent = $value[OptionProvider::KEY_CODE_MODIF];
+
+                    $value[OptionProvider::KEY_CODE_MODIF] = $dom->saveHTML();
+
+                } elseif( !empty($nodeScript->nodeValue) ) {
+
+                    if(!empty($value[OptionProvider::KEY_TIME])){
+                        $nodeScript->nodeValue = 'setTimeout(function(){ ' . $nodeScript->nodeValue . ' }, '.$value[OptionProvider::KEY_TIME].');';
+                    } 
+
+                    $nodeScript->setAttribute('type', $type);
+                    $nodeScript->setAttribute('data-cfasync', 'false');
+                    $value[OptionProvider::KEY_CODE_MODIF] = $dom->saveHTML();
+
+                }
+
+                 //$nodeNoScript = $nodes->getElementsByTagName('noscript');
+
+                /*
                 preg_match('/<script[^>]*src="([^"]+)"/', $value[OptionProvider::KEY_CODE], $matches);
                 if(!empty($matches[1])){ // Если есть src у скрипта
                     $value[OptionProvider::KEY_CODE_MODIF] = "var script = document.createElement('script'); script.src = '". $matches[1] ."'; script.charset = 'UTF-8'; document.getElementsByTagName('body')[0].appendChild(script);";
@@ -91,6 +134,7 @@ class OptionProvider
                         $value[OptionProvider::KEY_CODE_MODIF] = '<script type="'.$type.'" charset="UTF-8" data-cfasync="false">' . $value[OptionProvider::KEY_CODE_MODIF] . '</script>';
                     }
                 }
+                */
 
             }
             // endif
