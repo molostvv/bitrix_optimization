@@ -57,7 +57,7 @@ class OptionProvider
             }
         }
 
-        // Получаем src скриптов и модифицируем в случае необходимости
+        // Преобразуем скрипты в том случае, если в опциях установлено значения для отложенной загрузки или указано время для setTimeout 
         foreach ($arCodes as $key => &$value) {
             
             if( ($value[OptionProvider::KEY_DELAYED] == 'Y' || !empty($value[OptionProvider::KEY_TIME])) 
@@ -96,7 +96,7 @@ class OptionProvider
 
                     $value[OptionProvider::KEY_CODE_MODIF] = $dom->saveHTML();
 
-                } elseif( !empty($nodeScript->nodeValue) ) {
+                } elseif( !empty($nodeScript->nodeValue) ) { // встроенный скрипт
 
                     if(!empty($value[OptionProvider::KEY_TIME])){
                         $nodeScript->nodeValue = 'setTimeout(function(){ ' . $nodeScript->nodeValue . ' }, '.$value[OptionProvider::KEY_TIME].');';
