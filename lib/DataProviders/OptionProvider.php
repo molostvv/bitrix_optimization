@@ -106,36 +106,6 @@ class OptionProvider
 
                 }
 
-                 //$nodeNoScript = $nodes->getElementsByTagName('noscript');
-
-                /*
-                preg_match('/<script[^>]*src="([^"]+)"/', $value[OptionProvider::KEY_CODE], $matches);
-                if(!empty($matches[1])){ // Если есть src у скрипта
-                    $value[OptionProvider::KEY_CODE_MODIF] = "var script = document.createElement('script'); script.src = '". $matches[1] ."'; script.charset = 'UTF-8'; document.getElementsByTagName('body')[0].appendChild(script);";
-                
-                    if(!empty($value[OptionProvider::KEY_TIME])){
-                        $value[OptionProvider::KEY_CODE_MODIF] = 'setTimeout(function(){ ' . $value[OptionProvider::KEY_CODE_MODIF] . ' }, '.$value[OptionProvider::KEY_TIME].');';
-                    }
-
-                    $value[OptionProvider::KEY_CODE_MODIF] = '<script type="'.$type.'" charset="UTF-8" data-cfasync="false">' . $value[OptionProvider::KEY_CODE_MODIF] . '</script>';
-                } else { // Если встроенный скрипт
-                    $matches = [];
-                    preg_match('/<script\b[^>]*>(.*?)<\/script>/s', $value[OptionProvider::KEY_CODE], $matches);
-
-                    if (isset($matches[1])) {
-
-                        if(!empty($value[OptionProvider::KEY_TIME])){
-                            $value[OptionProvider::KEY_CODE_MODIF] = 'setTimeout(function(){ ' . $matches[1] . ' }, '.$value[OptionProvider::KEY_TIME].');';
-                        } else {
-                            $value[OptionProvider::KEY_CODE_MODIF] = $matches[1];
-                        }
-
-                        // todo: добавить для метрики noscript
-                        $value[OptionProvider::KEY_CODE_MODIF] = '<script type="'.$type.'" charset="UTF-8" data-cfasync="false">' . $value[OptionProvider::KEY_CODE_MODIF] . '</script>';
-                    }
-                }
-                */
-
             }
             // endif
         }
