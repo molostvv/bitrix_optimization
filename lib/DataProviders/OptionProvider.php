@@ -60,7 +60,9 @@ class OptionProvider
         // Получаем src скриптов и модифицируем в случае необходимости
         foreach ($arCodes as $key => &$value) {
             
-            if($value[OptionProvider::KEY_DELAYED] == 'Y' || !empty($value[OptionProvider::KEY_TIME])){
+            if( ($value[OptionProvider::KEY_DELAYED] == 'Y' || !empty($value[OptionProvider::KEY_TIME])) 
+                && !empty($value[OptionProvider::KEY_CODE])
+            ){
 
                 $type = 'text/javascript';
                 if($value[OptionProvider::KEY_DELAYED] == 'Y'){
