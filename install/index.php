@@ -55,7 +55,11 @@ Class Vspace_optimization extends CModule
         //$this->installDB();
         RegisterModule($this->MODULE_ID);
  
-        RegisterModuleDependences("main", "OnEndBufferContent", $this->MODULE_ID, "\Vspace\Optimization\Event", "OnEndBufferContent");
+        $eventManager = \Bitrix\Main\EventManager::getInstance();
+
+        $eventManager->registerEventHandler("main", "OnEndBufferContent", $this->MODULE_ID, "\Vspace\Optimization\Event", "OnEndBufferContent");
+        $eventManager->registerEventHandler("main", "OnAfterSetOption", $this->MODULE_ID, "\Vspace\Optimization\Event", "onAfterSetOptionHandler");
+
 
         $pageTitle = Loc::getMessage("VSPACE_OPT_MODULE_INSTALL") . ' ' . $this->MODULE_ID;
         $APPLICATION->IncludeAdminFile($pageTitle, $_SERVER["DOCUMENT_ROOT"] . '/' . $this->MODULE_FOLDER . '/modules/' . $this->MODULE_ID . '/install/step.php');
@@ -68,7 +72,10 @@ Class Vspace_optimization extends CModule
        // $this->uninstallDB();
         UnRegisterModule($this->MODULE_ID);
 
-        UnRegisterModuleDependences("main", "OnEndBufferContent", $this->MODULE_ID, "\Vspace\Optimization\Event", "OnEndBufferContent");
+        $eventManager = \Bitrix\Main\EventManager::getInstance();
+
+        $eventManager->unRegisterEventHandler("main", "OnEndBufferContent", $this->MODULE_ID, "\Vspace\Optimization\Event", "OnEndBufferContent");
+        $eventManager->unRegisterEventHandler("main", "OnAfterSetOption", $this->MODULE_ID, "\Vspace\Optimization\Event", "onAfterSetOptionHandler");
 
         $pageTitle = Loc::getMessage("VSPACE_OPT_MODULE_UNINSTALL") . ' ' . $this->MODULE_ID;
         $APPLICATION->IncludeAdminFile($pageTitle, $_SERVER["DOCUMENT_ROOT"] . '/' . $this->MODULE_FOLDER . '/modules/' . $this->MODULE_ID . '/install/unstep.php');

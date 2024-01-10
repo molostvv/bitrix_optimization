@@ -19,6 +19,11 @@ $keyScriptDelayed = OptionProvider::KEY_DELAYED;
 $keyScriptTime    = OptionProvider::KEY_TIME;
 $keyScriptCss     = OptionProvider::KEY_CSS;
 
+$arPlaces = [
+    OptionProvider::KEY_PLACE_HEAD        => '<head>',
+    OptionProvider::KEY_PLACE_BEGIN_BODY  => 'после <body>',
+    OptionProvider::KEY_PLACE_END_BODY    => 'перед </body>'
+];
 
 /*
  * Параметры модуля со значениями по умолчанию
@@ -75,13 +80,7 @@ $aTabs = array(
                 $keyScriptPlace .'_ym',
                 Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_PLACE'),
                 '',
-                array('selectbox',
-                    array(
-                        "head" => "<head>",
-                        "begin_body" => "после <body>",
-                        "end_body" => "перед </body>"
-                    )
-                )
+                array('selectbox', $arPlaces)
             ),
             array(
                 $keyScriptDelayed . '_ym',
@@ -108,13 +107,7 @@ $aTabs = array(
                 $keyScriptPlace . '_gtm',
                 Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_PLACE'),
                 '',
-                array('selectbox',
-                    array(
-                        "head" => "<head>",
-                        "begin_body" => "после <body>",
-                        "end_body" => "перед </body>"
-                    )
-                )
+                array('selectbox', $arPlaces)
             ),
             array(
                 $keyScriptDelayed . '_gtm',
@@ -156,12 +149,7 @@ for($i = 1; $i < 6; $i++){
         $keyScriptPlace . '_' .  $i,
         Loc::getMessage('VSPACE_OPT_OPTIONS_TAB_EXTERNAL_SCRIPTS_PLACE'),
         '',
-        array('selectbox',
-            array(
-                "head" => "<head>",
-                "begin_body" => "после <body>",
-                "end_body" => "перед </body>"
-            ))
+        array('selectbox', $arPlaces)
     ];
 
     $aTabs[0]["OPTIONS"][] = [
@@ -180,7 +168,7 @@ for($i = 1; $i < 6; $i++){
 }
 
 /*
- * Создаем форму для редактирвания параметров модуля
+ * Создаем форму для редактирования параметров модуля
  */
 $tabControl = new CAdminTabControl(
     'tabControl',
