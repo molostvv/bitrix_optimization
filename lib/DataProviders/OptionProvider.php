@@ -94,6 +94,21 @@ class OptionProvider
                 if(array_key_exists('src', $scriptParams)){ // внешний скрипт
                     $value[OptionProvider::KEY_CODE_MODIF] = "var script = document.createElement('script'); script.src = '". $scriptParams['src'] ."'; script.charset = 'UTF-8'; document.getElementsByTagName('body')[0].appendChild(script);";
                 
+                    // Обрабатываем скрипт css
+                    if(!empty($value[OptionProvider::KEY_CSS])){
+                        $linkParams = [];
+                        $domCss = new \DomDocument();
+                        $domCss->loadHTML($value[OptionProvider::KEY_CSS], LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
+                        $nodeLink = $domCss->getElementsByTagName('link');
+                        $nodeLink = is_object($nodeLink[0]) ? $nodeLink[0] : false;
+                        foreach ($nodeLink->attributes as $attr) {
+                            $linkParams[$attr->name] = $attr->value;
+                        }
+                        if(!empty($linkParams['href'])){
+                            $value[OptionProvider::KEY_CODE_MODIF] .= "var link  = document.createElement('link'); link.rel = 'stylesheet'; link.type = 'text/css'; link.href = '". $linkParams['href'] ."'; document.getElementsByTagName('head')[0].appendChild(link);";
+                        }
+                    }
+
                     if(!empty($value[OptionProvider::KEY_TIME])){
                         $value[OptionProvider::KEY_CODE_MODIF] = 'setTimeout(function(){ ' . $value[OptionProvider::KEY_CODE_MODIF] . ' }, '.$value[OptionProvider::KEY_TIME].');';
                     }
