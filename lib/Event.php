@@ -33,6 +33,11 @@ class Event {
         $beginBody = '<!-- beginBody -->' . Tools::$_optionData[ OptionProvider::KEY_PLACE_BEGIN_BODY ];
         $endBody   = '<!-- endBody -->'   . Tools::$_optionData[ OptionProvider::KEY_PLACE_END_BODY ];
 
+        // Подключаем скрипт с отложенной загрузкой
+        if(Tools::$_optionScriptDelayed){
+            $endBody .= Tools::getDelayedScript();
+        }
+
         if(!\Vspace\Optimization\Tools::isInsertedHead()){
         	$content = str_replace('</head>', $head . "\n" . '</head>', $content);
         }

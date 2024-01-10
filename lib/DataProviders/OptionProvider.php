@@ -24,7 +24,10 @@ class OptionProvider
 
     public function getOptions()
     {
-        $options = [];
+        $arResult = [
+            'DELAYED' => false
+        ];
+        $options  = [];
 
         $result = OptionTable::getList(array(
             'select'  => ['NAME', 'VALUE'],
@@ -54,6 +57,13 @@ class OptionProvider
                 if(array_key_exists($fragKey . $key, $options)){
                     $value[$fragKey] = $options[ $fragKey . $key ];
                 }
+            }
+        }
+
+        // Проверка наличия хотябы одного отложенного скрипта
+        foreach ($arCodes as $scriptData) {
+            if(isset($scriptData[OptionProvider::KEY_DELAYED]) && $scriptData[OptionProvider::KEY_DELAYED] == 'Y'){
+                $arResult['DELAYED'] = true;
             }
         }
 
@@ -113,10 +123,9 @@ class OptionProvider
         }
 
         // Группируем скрипты по месту вывода
-        $arResult = [];
         foreach ($arCodes as $fragKey => $data) {
             foreach ($data as $_key => $_value) {
-                $arResult[$data[OptionProvider::KEY_PLACE]][$fragKey][$_key] = $_value;
+                $arResult['SCRIPTS_PLACES'][$data[OptionProvider::KEY_PLACE]][$fragKey][$_key] = $_value;
             }
         }
 
