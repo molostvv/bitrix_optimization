@@ -7,23 +7,31 @@ use Bitrix\Main\Config\Option;
 use Vspace\Optimization\DataProviders\OptionProvider;
 
 class Script {
+    private static $instance;
 
-    static private $_isInsertedHead;
-    static private $_isInsertedBeginBody;
-    static private $_isInsertedEndBody;
+    public $cachePath;
+    public $cacheTtl;
+    public $cacheId;
 
-    static public $_optionData;
-    static public $_optionScriptDelayed;
+    private function __construct(){
+        $this->cachePath = '/vspace.optimization/ext_js/';
+        $this->cacheId   = 'js_optimization_cache';
+        $this->cacheTtl  = 3600 * 24;
+    }
 
-    static public $cachePath = '/vspace.optimization/ext_js/';
-    static public $cacheTtl  = 3600*24;
-    static public $cacheId   = 'optimization_cache';
+    public static function getInstance() {
+        if (empty(self::$instance)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
+    }
 
-    public static function externalScripts(){
+    public function getExternalScripts(){
 
+        $arResult = [];
         $cache = Cache::createInstance();
 
-        if ($cache->initCache(self::$cacheTtl, self::$cacheId, self::$cachePath))
+        if ($cache->initCache($this->cacheTtl, $this->cacheId, $this->cachePath))
         {
             $optionData = $cache->getVars();
         }
@@ -32,7 +40,7 @@ class Script {
             $optionData = [];
             $oProvider  = new OptionProvider();
             $option     = $oProvider->getOptions();
-            $optionData = self::processExternalScripts($option);
+            $optionData = $this->processExternalScripts($option);
             $optionData['rand'] = rand(0, 9999);
   
             if(empty($optionData)){
@@ -57,17 +65,18 @@ class Script {
                 }
             }
 
-            self::$_optionData[$place] = $content;
+            $arResult['SCRIPTS'][$place] = $content;
         }  
 
-        self::$_optionScriptDelayed = $optionData['DELAYED'];
+        $arResult['DELAYED'] = $optionData['DELAYED'];
 
+        return $arResult;
     }
 
     /*
     *  Преобразование скриптов в соответствие с выбранными опциями
     */
-    public static function processExternalScripts($options){
+    private function processExternalScripts($options){
         
         $arResult = [
             'DELAYED' => false
@@ -185,7 +194,7 @@ class Script {
     /**
     *  Возвращает скрипт отложенной загрузки
     */
-    public static function getDelayedScript(){
+    public function getDelayedScript(){
         $script = '<script type="text/javascript" id="delayed-scripts-js">';
             
             $delay_click = "false";
@@ -203,58 +212,5 @@ class Script {
         return $script;
     }
 
-    /**
-    *  Вставка кода в <head>
-    */
-    public static function insertHead(){
-        self::$_isInsertedHead = true;
-        echo '<!-- insertHead -->' . "\n" . Tools::$_optionData[ OptionProvider::KEY_PLACE_HEAD ] . "\n";
-    }
-
-    /**
-    *  Вставка кода после <body>
-    */
-    public static function insertBeginBody(){
-        self::$_isInsertedBeginBody = true;
-        echo '<!-- insertBeginBody -->' . "\n" . Tools::$_optionData[ OptionProvider::KEY_PLACE_BEGIN_BODY ] . "\n";
-    }
-
-    /**
-    *  Вставка кода перед </body>
-    */
-    public static function insertEndBody(){
-        self::$_isInsertedEndBody = true;
-        echo '<!-- insertEndBody -->' . "\n" . Tools::$_optionData[ OptionProvider::KEY_PLACE_END_BODY ] . "\n";
-    }
-    
-
-    /**
-    *  Проверка вставки кода в <head>
-    */
-    public static function isInsertedHead(){
-        if(empty(self::$_isInsertedHead)){
-            return false;
-        } return true;
-    }
-
-    /**
-    *  Проверка вставки кода после <body>
-    */
-    public static function isInsertedBeginBody(){
-        if(empty(self::$_isInsertedBeginBody)){
-            return false;
-        } return true;
-    }
-
-    /**
-    *  Проверка вставки кода перед </body>
-    */
-    public static function isInsertedEndBody(){
-        if(empty(self::$_isInsertedEndBody)){
-            return false;
-        } return true;
-    }
-
-
-
+ 
 }

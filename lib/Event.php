@@ -27,29 +27,29 @@ class Event {
             Tools::addPushHeaderCSS($content);
 
         // Обработка и вставка внешних скриптов
-        Script::externalScripts();
+        $oScript = Script::getInstance();
+        $extrenalScriptsData = $oScript->getExternalScripts();
+        $extrenalScripts = $extrenalScriptsData['SCRIPTS'];
 
-
-        // Проверка, если нет кода получения кода в шаблоне, то вставить спомощью замены.
-        $head 	   = '<!-- head -->'      . Script::$_optionData[ OptionProvider::KEY_PLACE_HEAD ];
-        $beginBody = '<!-- beginBody -->' . Script::$_optionData[ OptionProvider::KEY_PLACE_BEGIN_BODY ];
-        $endBody   = '<!-- endBody -->'   . Script::$_optionData[ OptionProvider::KEY_PLACE_END_BODY ];
+        $head 	   = $extrenalScripts[ OptionProvider::KEY_PLACE_HEAD ];
+        $beginBody = $extrenalScripts[ OptionProvider::KEY_PLACE_BEGIN_BODY ];
+        $endBody   = $extrenalScripts[ OptionProvider::KEY_PLACE_END_BODY ];
 
         // Подключаем скрипт с отложенной загрузкой
-        if(Script::$_optionScriptDelayed){
-            $endBody .= Script::getDelayedScript();
+        if($extrenalScriptsData['DELAYED']){
+            $endBody .= $oScript->getDelayedScript();
         }
 
-        if(!Script::isInsertedHead()){
-        	$content = str_replace('</head>', $head . "\n" . '</head>', $content);
+        if(!empty($head)){
+        	$content = str_replace('</head>', '<!-- head -->'. $head . "\n" . '</head>', $content);
         }
 
-        if(!Script::isInsertedBeginBody()){
-        	$content = preg_replace('/<body([^>]*)>/is', '<body$1>' . "\n" . $beginBody, $content);
+        if(!empty($beginBody)){
+        	$content = preg_replace('/<body([^>]*)>/is', '<body$1>' . "\n" . '<!-- beginBody -->' . $beginBody, $content);
         }
   
-        if(!Script::isInsertedEndBody()){
-        	$content = str_replace('</body>', $endBody . "\n" . '</body>', $content);
+        if(!empty($endBody)){
+        	$content = str_replace('</body>', '<!-- endBody -->' . $endBody . "\n" . '</body>', $content);
         }      
         
     }
@@ -59,8 +59,10 @@ class Event {
     */
     public static function onAfterSetOptionHandler()
     {
+        $oScript = Script::getInstance();
+
         $cache = new \CPHPCache();
-        $cache->cleanDir(Script::$cachePath);
+        $cache->cleanDir($oScript->cachePath);
     }
 
 }
